@@ -27,6 +27,7 @@ router.register(r'groups', views.GroupViewSet)
 # down to using regular class-based views, and writing the URL conf explicitly.
 # Additionally, we include login URLs for the browsable API
 urlpatterns = [
-  path('', include(router.urls)),
+  #path('', include(router.urls)),
+  path('', include('snippets.urls')),
   path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
