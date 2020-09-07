@@ -1,12 +1,14 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
-from rest_framework.renderers import JSONRenderer
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework_xml.renderers import XMLRenderer
 
 # Create your views here.
 @api_view(['GET','POST'])
+@renderer_classes([BrowsableAPIRenderer, JSONRenderer, XMLRenderer])
 def snippet_list(request, format=None):
   """
   List all code snippets, or create a new snippet
@@ -24,6 +26,7 @@ def snippet_list(request, format=None):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@renderer_classes([BrowsableAPIRenderer, JSONRenderer, XMLRenderer])
 def snippet_detail(request, pk, format=None):
   """
   Retrieve, update, or delete a code snippet.
