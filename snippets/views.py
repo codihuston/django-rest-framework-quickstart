@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
-from rest_framework import generics, permissions, renderers
+from rest_framework import generics, permissions, renderers, viewsets
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework_xml.renderers import XMLRenderer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -17,41 +17,35 @@ def api_root(request, format=None):
     'snippets': reverse('snippet-list', request=request, format=format)
   })
 
-class UserList(generics.ListAPIView):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+  """
+  This viewset automatically provides `list` and `detail` actions
+  """
   queryset = User.objects.all()
   serializer_class = UserSerializer
 
-class UserDetail(generics.RetrieveAPIView):
-  queryset = User.objects.all()
-  serializer_class = UserSerializer
+class SnippetViewSet(viewsets.ModelViewSet):
+  """
+  This viewset automatically provides `list`, `create`, `retrieve`,
+  `update`, and `destroy` actions.
 
-class SnippetList(generics.ListCreateAPIView):
-  permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+  Additionally, we provide the extra `highlight` action
+  """
   queryset = Snippet.objects.all()
   serializer_class = SnippetSerializer
-  renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
-
-  def perform_create(self, serializer):
-    """
-    We need to override this, because as incoming data comes in, we need
-    to associate it with a user. With the line below, the '.create()' method
-    in the serializer will now be passed an additional 'owner' field, along
-    with the validated data from the request.
-
-    After this change, now you need to update the serializer to handle this.
-    """
-    serializer.save(owner=self.request.user)
-
-class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
   permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-  queryset = Snippet.objects.all()
-  serializer_class = SnippetSerializer
-  renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
 
-class SnippetHighlight(generics.GenericAPIView):
-  queryset = Snippet.objects.all()
-  renderer_classes = [renderers.StaticHTMLRenderer]
+  @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+  def highlight(self, request, *args, **kwargs):
+    """
+    Custom actions respond to GET by default; use the methods= kwarg if you
+    want to change that (to POST, for example).
 
-  def get(self, request, *args, **kwargs):
+    If you want to change the URL path, you can provide the `url_path` kwarg
+    to change it.
+    """
     snippet = self.get_object()
     return Response(snippet.highlighted)
+
+  def perform_create(self, serializer):
+    serializer.save(owner=self.request.user)
