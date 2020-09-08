@@ -47,9 +47,13 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     Custom actions, get this user's permissions @ /users/1/permissions
     """
     user = self.get_object()
-    # TODO: get ALL user's permissions (including group permissions!)
-    return Response(UserSerializer(user, context={'request':request}).data['user_permissions'])
-
+    # Get ALL user's permissions (including group permissions!)
+    # OR together two querysets: https://docs.djangoproject.com/en/3.0/ref/models/querysets/
+    # De-duplicate perms that may exist on both the user and group
+    permissions = list(set(Permission.objects.filter(group__user=user) | user.user_permissions.all()))
+    return Response(PermissionSerializer(permissions, many=True, context={'request':request}).data)
+    #return Response(UserSerializer(user, context={'request':request}).data['user_permissions'])
+    #list(set(chain(user.user_permissions.filter(content_type=ctype).values_list('codename', flat=True), Permission.objects.filter(group__user=user, content_type=ctype).values_list('codename', flat=True))))
 class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
   renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
   queryset = Permission.objects.all()
