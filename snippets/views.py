@@ -1,3 +1,4 @@
+import pdb;
 from django.contrib.auth.models import User, Permission, Group
 from rest_framework import generics, permissions, renderers, viewsets
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
@@ -39,7 +40,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     Custom actions, get this user's groups @ /users/1/groups
     """
     user = self.get_object()
-    return Response(UserSerializer(user, context={'request':request}).data['groups'])
+    return Response(GroupSerializer(user.groups.all(), many=True, context={'request':request}).data)
 
   @action(detail=True, methods=['get'])
   def permissions(self, request, *args, **kwargs):
