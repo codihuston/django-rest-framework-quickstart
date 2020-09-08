@@ -35,7 +35,16 @@ class SnippetViewSet(viewsets.ModelViewSet):
   renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
   queryset = Snippet.objects.all()
   serializer_class = SnippetSerializer
-  permission_classes = [CanRetrieveSnippet]
+
+  def get_permissions(self):
+      """
+      Instantiates and returns the list of permissions that this view requires.
+      """
+      permission_classes = []
+      if self.action == 'retrieve':
+        permission_classes = [permissions.IsAuthenticated, CanRetrieveSnippet]
+        print(permission_classes)
+      return [permission() for permission in permission_classes]
       
   @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
   def highlight(self, request, *args, **kwargs):

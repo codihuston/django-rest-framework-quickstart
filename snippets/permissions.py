@@ -19,16 +19,9 @@ class CanRetrieveSnippet(permissions.BasePermission):
   - can view snippets AND own the snippet
   """
   def has_permission(self, request, view):
-    print(view.action)
-    if view.action in ['retrieve']:
-      return request.user.has_perm("snippets.view_snippet")
-    return True
+    return request.user.has_perm("snippets.view_snippet")
 
-  def has_object_permission(self, request, view, obj):    
-    # write permissions are only allowed to the ownwer of the snippet
-    print(view.action)
-    if view.action in ['retrieve']:
+  def has_object_permission(self, request, view, obj):
       return obj.owner == request.user
-    return True
 
 
