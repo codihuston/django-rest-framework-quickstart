@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User, Permission, Group
 from snippets.models import Snippet, LANGUAGE_CHOICES, SYTLE_CHOICES
 
 
@@ -31,3 +31,8 @@ class PermissionSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = Permission
     fields = ['id', 'codename', 'name']
+
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+  class Meta:
+    model = Group
+    fields = ['id', 'name']
