@@ -28,13 +28,23 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = Group
     fields = ['id', 'name']
-    
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+  # implement baked-in mapped relationships
   snippets = SnippetSerializer(many=True)
   groups = GroupSerializer(many=True)
-  user_permissions = PermissionSerializer(many=True)
-  #snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
+  # implement a custom field
+  permissions = serializers.SerializerMethodField()
+
+  def get_permissions(self, obj):
+    """
+    Get ALL user's permissions (including group permissions!)
+    OR together two querysets: https://docs.djangoproject.com/en/3.0/ref/models/querysets/
+    De-duplicate perms that may exist on both the user and group
+    """
+    permissions = list(set(Permission.objects.filter(group__user=obj) | obj.user_permissions.all()))
+    return PermissionSerializer(permissions, many=True).data
 
   class Meta:
     model = User
-    fields = ['id', 'username', 'snippets', 'groups', 'user_permissions']
+    fields = ['id', 'username', 'snippets', 'groups', 'permissions']
