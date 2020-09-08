@@ -19,14 +19,6 @@ class SnippetSerializer(serializers.HyperlinkedModelSerializer):
     fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlight']
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-  snippets = SnippetSerializer(many=True)
-  #snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
-
-  class Meta:
-    model = User
-    fields = ['id', 'username', 'snippets', 'groups', 'user_permissions']
-
 class PermissionSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = Permission
@@ -36,3 +28,13 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = Group
     fields = ['id', 'name']
+    
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+  snippets = SnippetSerializer(many=True)
+  groups = GroupSerializer(many=True)
+  user_permissions = PermissionSerializer(many=True)
+  #snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
+
+  class Meta:
+    model = User
+    fields = ['id', 'username', 'snippets', 'groups', 'user_permissions']

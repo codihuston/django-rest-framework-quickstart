@@ -28,10 +28,27 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
   @action(detail=True, methods=['get'])
   def snippets(self, request, *args, **kwargs):
     """
-    Custom actions, get snippets owned by this user
+    Custom actions, get snippets owned by this user @ /users/1/snippets
     """
-    snippets = self.get_object()
-    return Response(UserSerializer(snippets, context={'request':request}).data['snippets'])
+    user = self.get_object()
+    return Response(UserSerializer(user, context={'request':request}).data['snippets'])
+
+  @action(detail=True, methods=['get'])
+  def groups(self, request, *args, **kwargs):
+    """
+    Custom actions, get this user's groups @ /users/1/groups
+    """
+    user = self.get_object()
+    return Response(UserSerializer(user, context={'request':request}).data['groups'])
+
+  @action(detail=True, methods=['get'])
+  def permissions(self, request, *args, **kwargs):
+    """
+    Custom actions, get this user's permissions @ /users/1/permissions
+    """
+    user = self.get_object()
+    # TODO: get ALL user's permissions (including group permissions!)
+    return Response(UserSerializer(user, context={'request':request}).data['user_permissions'])
 
 class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
   renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
@@ -61,7 +78,6 @@ class SnippetViewSet(viewsets.ModelViewSet):
       permission_classes = []
       if self.action == 'retrieve':
         permission_classes = [permissions.IsAuthenticated, CanRetrieveSnippet]
-        print(permission_classes)
       return [permission() for permission in permission_classes]
       
   @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
