@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from snippets.models import Snippet
-from snippets.permissions import IsOwnerOrReadOnly
+from snippets.permissions import CanRetrieveSnippet
 from snippets.serializers import SnippetSerializer, UserSerializer
 
 @api_view(['GET'])
@@ -35,8 +35,8 @@ class SnippetViewSet(viewsets.ModelViewSet):
   renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
   queryset = Snippet.objects.all()
   serializer_class = SnippetSerializer
-  permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
+  permission_classes = [CanRetrieveSnippet]
+      
   @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
   def highlight(self, request, *args, **kwargs):
     """
