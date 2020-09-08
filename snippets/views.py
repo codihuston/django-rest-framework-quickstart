@@ -25,6 +25,14 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = User.objects.all()
   serializer_class = UserSerializer
 
+  @action(detail=True, methods=['get'])
+  def snippets(self, request, *args, **kwargs):
+    """
+    Custom actions, get snippets owned by this user
+    """
+    snippets = self.get_object()
+    return Response(UserSerializer(snippets, context={'request':request}).data['snippets'])
+
 class SnippetViewSet(viewsets.ModelViewSet):
   """
   This viewset automatically provides `list`, `create`, `retrieve`,
