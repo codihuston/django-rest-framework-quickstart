@@ -8,7 +8,7 @@ class SnippetSerializer(serializers.HyperlinkedModelSerializer):
   # (see views/SnippetList), we need to reflect that here by adding this field
   # The untyped `ReadOnlyField` will only be used for serializing, but never
   # when mutating a model instance
-  owner = serializers.ReadOnlyField(source='owner.username')
+  user_id = serializers.ReadOnlyField(source='owner.id')
   # replace the line above with the line below to get href to user instead
   #owner = serializers.HyperlinkedIdentityField(view_name='user-detail')
   highlight = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')
@@ -16,7 +16,7 @@ class SnippetSerializer(serializers.HyperlinkedModelSerializer):
   class Meta:
     model = Snippet
     # also add owner here
-    fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlight']
+    fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'user_id', 'highlight']
 
 
 class PermissionSerializer(serializers.HyperlinkedModelSerializer):
