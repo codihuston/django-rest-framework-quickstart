@@ -2,12 +2,6 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from snippets.models import Snippet, LANGUAGE_CHOICES, SYTLE_CHOICES
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-  snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
-
-  class Meta:
-    model = User
-    fields = ['id', 'username', 'snippets']
 
 class SnippetSerializer(serializers.HyperlinkedModelSerializer):
   # now that snippets are associated with the user that created them 
@@ -23,3 +17,12 @@ class SnippetSerializer(serializers.HyperlinkedModelSerializer):
     model = Snippet
     # also add owner here
     fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlight']
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+  snippets = SnippetSerializer(many=True)
+  #snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
+
+  class Meta:
+    model = User
+    fields = ['id', 'username', 'snippets']
