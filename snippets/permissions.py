@@ -22,6 +22,6 @@ class CanRetrieveSnippet(permissions.BasePermission):
     return request.user.has_perm("snippets.view_snippet")
 
   def has_object_permission(self, request, view, obj):
-      return obj.owner == request.user
+    return obj.owner == request.user
 
 
