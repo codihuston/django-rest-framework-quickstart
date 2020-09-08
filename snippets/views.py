@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from rest_framework import generics, permissions, renderers, viewsets
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework_xml.renderers import XMLRenderer
@@ -8,7 +8,7 @@ from rest_framework.reverse import reverse
 
 from snippets.models import Snippet
 from snippets.permissions import CanRetrieveSnippet
-from snippets.serializers import SnippetSerializer, UserSerializer
+from snippets.serializers import SnippetSerializer, UserSerializer, PermissionSerializer
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -32,6 +32,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     snippets = self.get_object()
     return Response(UserSerializer(snippets, context={'request':request}).data['snippets'])
+
+class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
+  renderer_classes = [BrowsableAPIRenderer, JSONRenderer, XMLRenderer]
+  queryset = Permission.objects.all()
+  serializer_class = PermissionSerializer
 
 class SnippetViewSet(viewsets.ModelViewSet):
   """
