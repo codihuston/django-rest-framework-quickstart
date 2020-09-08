@@ -45,6 +45,6 @@ class SnippetViewSetTestCase(TestCase):
     snippet = Snippet.objects.create(code="testcode", owner=self.user)
 
     # update a snippet
-    response = self.client.put('/snippets/' + str(snippet.id), json.dumps({"code":"abcdefg"}), content_type="application/json")
+    response = self.client.put('/snippets/' + str(snippet.id), {"code":"abcdefg"}, content_type="application/json")
     self.assertEqual(response.status_code, 200)
 
