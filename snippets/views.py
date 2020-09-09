@@ -79,6 +79,9 @@ class SnippetViewSet(viewsets.ModelViewSet):
       if self.action == 'retrieve':
         permission_classes = [permissions.IsAuthenticated, CanRetrieveSnippet]
       return [permission() for permission in permission_classes]
+
+  def perform_create(self, serializer):
+    serializer.save(owner=self.request.user)
       
   @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
   def highlight(self, request, *args, **kwargs):
@@ -91,6 +94,3 @@ class SnippetViewSet(viewsets.ModelViewSet):
     """
     snippet = self.get_object()
     return Response(snippet.highlighted)
-
-  def perform_create(self, serializer):
-    serializer.save(owner=self.request.user)
