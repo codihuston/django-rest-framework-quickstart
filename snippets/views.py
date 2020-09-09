@@ -81,6 +81,12 @@ class SnippetViewSet(viewsets.ModelViewSet):
       return [permission() for permission in permission_classes]
 
   def perform_create(self, serializer):
+    # perhaps the user id is not included in the request to create this
+    # snippet; we don't need it, since the request object already has
+    # the user object on it. To solidify this relationship, we can
+    # pass this into the save method of the serializer. Since the 'owner'
+    # field is mapped to the user model in the snippet model, the serializer
+    # understands that we are assigning this user to this snippet
     serializer.save(owner=self.request.user)
       
   @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
